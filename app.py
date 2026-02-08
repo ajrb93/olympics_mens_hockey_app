@@ -9,13 +9,7 @@ st.set_page_config(layout="wide", page_title="Olympics Fantasy")
 st.markdown("""
     <style>
     /* Reduce top/side margins */
-    .block-container {padding-top: 2.8rem; padding-bottom: 0rem; padding-left: 1rem; padding-right: 2rem;}
-            
-    /* Ensure the Tab labels stay readable */
-    button[data-baseweb="tab"] p {
-        font-size: 14px !important;
-        font-weight: bold !important;
-    }
+    .block-container {padding-top: 2.8rem; padding-bottom: 2rem; padding-left: 1rem; padding-right: 2rem;}
             
     /* Shrinks the expander header text and reduces the vertical padding */
             .streamlit-expanderHeader {
@@ -57,11 +51,10 @@ def load_and_clean_data():
 df = load_and_clean_data()
 
 # Formatting Helper: 1 decimal for FPoints, 0 for the rest
-fmt_dict = {'FPoints': '{:.1f}', 'g': '{:.0f}', 'a': '{:.0f}', 'gwg': '{:.0f}'}
+fmt_dict = {'FPoints': '{:.1f}', 'g': '{:.0f}', 'a': '{:.0f}'}
 
 # --- MAIN DASHBOARD ---
 col1, col2, col3 = st.columns([1,2,2])
-tab_cy, tab_alltime = st.tabs([f"🏆 Single-Year Records", "📜 All-Time Records"])    # --- COLUMN 1: LEFT ---
 with col1:
     available_years = sorted(df['year'].unique(), reverse=True)
         
@@ -105,7 +98,7 @@ with col2:
 
     st.markdown("### Top Players")
     best_tourney = cy_df.fillna('Undrafted').groupby(['name','pos', 'team']).agg({'Draftee':'last',
-            'FPoints': 'sum', 'g': 'sum', 'a': 'sum', 'gwg': 'sum'
+            'FPoints': 'sum', 'g': 'sum', 'a': 'sum',
         }).reset_index().sort_values('FPoints', ascending=False)
         
     st.dataframe(best_tourney.style.format(fmt_dict), height=250, use_container_width=True, hide_index=True,
@@ -119,7 +112,7 @@ with col3:
     for i, manager in enumerate(ordered_managers):
         manager_data = cy_df[cy_df['Draftee'] == manager]
         player_detail = manager_data.groupby(['name','pos','team', 'draft_type']).agg({
-            'FPoints': 'sum', 'g': 'sum', 'a': 'sum', 'gwg': 'sum'
+            'FPoints': 'sum', 'g': 'sum', 'a': 'sum'
         }).reset_index().sort_values('FPoints', ascending=False)
            
         pts_val = standings.loc[standings['Draftee']==manager, 'FPoints'].values[0]
