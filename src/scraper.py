@@ -26,7 +26,7 @@ def get_website(url):
 
 def extract_schedule_list(year):
     schedule_url_list = []
-    soup_file = get_website('https://www.iihf.com/en/events/'+year+'/wm20/schedule')
+    soup_file = get_website('https://www.iihf.com/en/events/'+year+'/olympic-w/schedule')
     soup = BeautifulSoup(soup_file,'html.parser')
     temp_game_url = soup.find_all('a',{'class':'s-hover__link','target':'_blank'})
     for j in range(0,len(temp_game_url)):
@@ -163,7 +163,7 @@ def run_pipeline():
     if all_files:
         stats_full = pd.concat([pd.read_csv(f) for f in all_files])
         stats_full = stats_full[stats_full.pos != 'GK']
-        stats_full['FP'] = (stats_full.g*1.5+ stats_full.a+ stats_full.gwg*3)
+        stats_full['FP'] = (stats_full.g*1.5+ stats_full.a)
         total_spm = stats_full.sog.sum() / (stats_full.game_id.max() * 2 * 60)
         stats_full['minutes'] = stats_full.tot.str.split(':').str[0].astype('int') + stats_full.tot.str.split(':').str[1].astype('int')/60
         stats_full['team_spma'] = (stats_full.groupby(['team','game_id']).sog.transform('sum') / (stats_full.groupby(['team','game_id']).minutes.transform('sum') / 6))
@@ -186,24 +186,15 @@ def transform_final_dataset():
     else:
         print("First run: Final_Master_Dataset.csv not found. Creating empty template.")
         current = pd.DataFrame(columns=['year','name','game_id'])
-    historical = pd.read_csv('data/static/Stats_Historical.csv')
-    rosters = pd.read_csv('data/static/Rosters_Full.csv')
     draft = pd.read_csv('data/static/DraftResults.txt',index_col=False) 
 
     cols_to_drop = ['Pos','Pos_ID','Unnamed: 0.1','Unnamed: 0','tot','shf']
-    current = current.drop(columns=[c for c in cols_to_drop if c in current.columns])
-    historical = historical.drop(columns=[c for c in historical.columns if 'Unnamed' in c])
-    
-    current = current[~current.year.isin(historical.year.unique())]
-    stats = pd.concat((current, historical))
-
-    rosters = rosters.drop(columns=[c for c in rosters.columns if 'Unnamed' in c])
-    stats = stats.merge(rosters, how='left')
+    stats = current.drop(columns=[c for c in cols_to_drop if c in current.columns])
     df = stats.merge(draft, how='left')
 
     df.loc[(~df.fantasyplayer.isna()) & (df.game_start > df.game_id), 'fantasyplayer'] = np.nan 
     df.loc[df.game_start == 0, 'draft_type'] = 'Initial'
-    df.loc[(df.game_start >= 25) & ~(df.fantasyplayer.isna()), 'draft_type'] = 'Secondary'
+    df.loc[(df.game_start >= 100) & ~(df.fantasyplayer.isna()), 'draft_type'] = 'Secondary'
     df = df.fillna('')
 
     df.to_csv('data/dynamic/Final_Master_Dataset.csv', index=False)
