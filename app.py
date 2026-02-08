@@ -35,10 +35,8 @@ st.markdown("""
 
 # COUNTRY HEX CODES
 COUNTRY_COLORS = {
-    'Canada': '#EF3340', 'Sweden': '#FFCD00', 'USA': '#002868', 
-    'Finland': '#003580', 'Czechia': '#11457E', 'Slovakia': '#003399',
-    'Switzerland': '#DA291C', 'Germany': '#000000', 'Latvia': '#9E3039', 'Kazakhstan': '#00B1D8'
-}
+    'Canada': '#EF3340', 'Czechia': '#11457E','Denmark':'#C8102E','Finland': '#003580','France':'#000091','Germany': '#000000',
+    'Italy':'#008C45','Latvia': '#9E3039','Slovakia': '#003399','Sweden': '#FFCD00','Switzerland': '#DA291C','USA': '#002868'}
 
 
 def load_and_clean_data():
@@ -56,17 +54,7 @@ fmt_dict = {'FPoints': '{:.1f}', 'g': '{:.0f}', 'a': '{:.0f}'}
 # --- MAIN DASHBOARD ---
 col1, col2, col3 = st.columns([1,2,2])
 with col1:
-    available_years = sorted(df['year'].unique(), reverse=True)
-        
-    # 'collapsed' visibility keeps the UI tight by removing the top label space
-    selected_year = st.selectbox(
-            "Select Year", 
-            options=available_years, 
-            index=0, 
-            key="cy_year_picker",
-            label_visibility="collapsed" 
-        )
-    cy_df = df[df['year'] == selected_year].copy()
+    cy_df = df[df['year'] == df['year'].max()].copy()
 
     st.markdown("### Standings")
     standings = cy_df.groupby('Draftee')['FPoints'].sum().reset_index().sort_values('FPoints', ascending=False)
