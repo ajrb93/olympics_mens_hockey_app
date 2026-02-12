@@ -59,7 +59,7 @@ with col1:
     st.markdown("### Standings")
     standings = cy_df.groupby('Draftee')['FPoints'].sum().reset_index().sort_values('FPoints', ascending=False)
     st.dataframe(standings.style.format({'FPoints': '{:.1f}'}).background_gradient(cmap='RdYlGn', subset=['FPoints']), 
-                     hide_index=True, use_container_width=True, height=180)
+                     hide_index=True, use_container_width=True, height=216)
 
     st.markdown("### % Drafted")
     fig_pie = px.pie(cy_df, values='FPoints', names='draft_type', hole=0.4)
