@@ -26,7 +26,7 @@ def get_website(url):
 
 def extract_schedule_list(year):
     schedule_url_list = []
-    soup_file = get_website('https://www.iihf.com/en/events/'+year+'/olympic-w/schedule')
+    soup_file = get_website('https://www.iihf.com/en/events/'+year+'/olympic-m/schedule')
     soup = BeautifulSoup(soup_file,'html.parser')
     temp_game_url = soup.find_all('a',{'class':'s-hover__link','target':'_blank'})
     for j in range(0,len(temp_game_url)):
